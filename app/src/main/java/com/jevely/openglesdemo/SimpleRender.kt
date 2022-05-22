@@ -16,6 +16,8 @@ class SimpleRender(private val iDrawer: IDrawer) : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+        //设置OpenGL窗口坐标
+        iDrawer.setWorldSize(width, height)
     }
 
     override fun onDrawFrame(gl: GL10?) {

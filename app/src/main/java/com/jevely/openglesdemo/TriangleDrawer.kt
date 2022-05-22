@@ -55,6 +55,13 @@ class TriangleDrawer : IDrawer {
         mTextureBuffer.position(0)
     }
 
+    override fun setVideoSize(videoW: Int, videoH: Int) {
+
+    }
+
+    override fun setWorldSize(worldW: Int, worldH: Int) {
+
+    }
 
     override fun draw() {
         if (mTextureId != -1) {

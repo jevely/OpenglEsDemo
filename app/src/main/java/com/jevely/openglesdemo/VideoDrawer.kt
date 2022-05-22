@@ -1,10 +1,9 @@
 package com.jevely.openglesdemo
 
-import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
-import android.opengl.GLUtils
+import android.opengl.Matrix
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -50,6 +49,17 @@ class VideoDrawer() : IDrawer {
     private lateinit var mVertexBuffer: FloatBuffer
     private lateinit var mTextureBuffer: FloatBuffer
 
+    private var mWorldWidth: Int = -1
+    private var mWorldHeight: Int = -1
+    private var mVideoWidth: Int = -1
+    private var mVideoHeight: Int = -1
+
+    //坐标变换矩阵
+    private var mMatrix: FloatArray? = null
+
+    //矩阵变换接收者
+    private var mVertexMatrixHandler: Int = -1
+
     private var mSftCb: ((SurfaceTexture) -> Unit)? = null
 
     init {
@@ -78,8 +88,20 @@ class VideoDrawer() : IDrawer {
         }
     }
 
+    override fun setVideoSize(videoW: Int, videoH: Int) {
+        mVideoWidth = videoW
+        mVideoHeight = videoH
+    }
+
+    override fun setWorldSize(worldW: Int, worldH: Int) {
+        mWorldWidth = worldW
+        mWorldHeight = worldH
+    }
+
     override fun draw() {
         if (mTextureId != -1) {
+            //【新增1: 初始化矩阵方法】
+            initDefMatrix()
             //【步骤2: 创建、编译并启动OpenGL着色器】
             createGLPrg()
             //【步骤3: 激活并绑定纹理单元】
@@ -88,6 +110,66 @@ class VideoDrawer() : IDrawer {
             updateTexture()
             //【步骤3: 开始渲染绘制】
             doDraw()
+        }
+    }
+
+    private fun initDefMatrix() {
+        if (mMatrix != null) return
+        if (mVideoWidth != -1 && mVideoHeight != -1 &&
+            mWorldWidth != -1 && mWorldHeight != -1
+        ) {
+            mMatrix = FloatArray(16)
+            val prjMatrix = FloatArray(16)
+            val originRatio = mVideoWidth / mVideoHeight.toFloat()
+            val worldRatio = mWorldWidth / mWorldHeight.toFloat()
+            if (mWorldWidth > mWorldHeight) {
+                if (originRatio > worldRatio) {
+                    val actualRatio = originRatio / worldRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -1f, 1f,
+                        -actualRatio, actualRatio,
+                        -1f, 3f
+                    )
+                } else {// 原始比例小于窗口比例，缩放高度度会导致高度超出，因此，高度以窗口为准，缩放宽度
+                    val actualRatio = worldRatio / originRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -actualRatio, actualRatio,
+                        -1f, 1f,
+                        -1f, 3f
+                    )
+                }
+            } else {
+                if (originRatio > worldRatio) {
+                    val actualRatio = originRatio / worldRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -1f, 1f,
+                        -actualRatio, actualRatio,
+                        -1f, 3f
+                    )
+                } else {// 原始比例小于窗口比例，缩放高度会导致高度超出，因此，高度以窗口为准，缩放宽度
+                    val actualRatio = worldRatio / originRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -actualRatio, actualRatio,
+                        -1f, 1f,
+                        -1f, 3f
+                    )
+                }
+            }
+
+            //设置相机位置
+            val viewMatrix = FloatArray(16)
+            Matrix.setLookAtM(
+                viewMatrix, 0,
+                0f, 0f, 5.0f,
+                0f, 0f, 0f,
+                0f, 1.0f, 0f
+            )
+            //计算变换矩阵
+            Matrix.multiplyMM(mMatrix, 0, prjMatrix, 0, viewMatrix, 0)
         }
     }
 
@@ -109,6 +191,8 @@ class VideoDrawer() : IDrawer {
             mTexturePosHandler = GLES20.glGetAttribLocation(mProgram, "aCoordinate")
             //【注3：新增获取纹理接收者】
             mTextureHandler = GLES20.glGetUniformLocation(mProgram, "uTexture")
+            //【新增2: 获取顶点着色器中的矩阵变量】
+            mVertexMatrixHandler = GLES20.glGetUniformLocation(mProgram, "uMatrix")
         }
         //使用OpenGL程序
         GLES20.glUseProgram(mProgram)
@@ -126,11 +210,14 @@ class VideoDrawer() : IDrawer {
 
     private fun getVertexShader(): String {
         return "attribute vec4 aPosition;" +
+                //【新增4: 矩阵变量】
+                "uniform mat4 uMatrix;" +
                 "attribute vec2 aCoordinate;" +
                 "varying vec2 vCoordinate;" +
                 "void main() {" +
-                "  gl_Position = aPosition;" +
-                "  vCoordinate = aCoordinate;" +
+                //【新增5: 坐标变换】
+                "    gl_Position = aPosition*uMatrix;" +
+                "    vCoordinate = aCoordinate;" +
                 "}"
     }
 
@@ -183,6 +270,8 @@ class VideoDrawer() : IDrawer {
         //启用顶点的句柄
         GLES20.glEnableVertexAttribArray(mVertexPosHandler)
         GLES20.glEnableVertexAttribArray(mTexturePosHandler)
+        // 【新增3: 将变换矩阵传递给顶点着色器】
+        GLES20.glUniformMatrix4fv(mVertexMatrixHandler, 1, false, mMatrix, 0)
         //设置着色器参数
         GLES20.glVertexAttribPointer(mVertexPosHandler, 2, GLES20.GL_FLOAT, false, 0, mVertexBuffer)
         GLES20.glVertexAttribPointer(
