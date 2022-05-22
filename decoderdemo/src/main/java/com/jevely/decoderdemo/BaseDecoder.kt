@@ -67,6 +67,11 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
 
     protected var mVideoHeight = 0
 
+    /**
+     * 同步音视频的时间
+     */
+    private var mStartTimeForSync = -1L
+
     override fun pause() {
         mState = DecodeState.PAUSE
     }
@@ -127,7 +132,9 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
     }
 
     override fun run() {
-        mState = DecodeState.START
+        if (mState == DecodeState.STOP) {
+            mState = DecodeState.START
+        }
         mStateListener?.decoderPrepare(this)
 
         //【解码步骤：1. 初始化，并启动解码器】
@@ -139,6 +146,8 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
                 mState != DecodeState.SEEKING
             ) {
                 waitDecode()
+
+                mStartTimeForSync = System.currentTimeMillis() - getCurTimeStamp()
             }
 
             if (!mIsRunning ||
@@ -146,6 +155,10 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
             ) {
                 mIsRunning = false
                 break
+            }
+
+            if (mStartTimeForSync == -1L) {
+                mStartTimeForSync = System.currentTimeMillis()
             }
 
             //如果数据没有解码完毕，将数据推入解码器解码
@@ -159,6 +172,10 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
             val index = pullBufferFromDecoder()
             Log.d("LJW", "将解码好的数据从缓冲区拉取出来 | $index")
             if (index >= 0) {
+                // ---------【音视频同步】-------------
+                if (mState == DecodeState.DECODING) {
+                    sleepRender()
+                }
                 Log.d("LJW", "渲染")
                 //【解码步骤：4. 渲染】
                 render(mOutputBuffers!![index], mBufferInfo)
@@ -178,6 +195,18 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
         doneDecode()
         //【解码步骤：7. 释放解码器】
         release()
+    }
+
+    private fun sleepRender() {
+        val passTime = System.currentTimeMillis() - mStartTimeForSync
+        val curTime = getCurTimeStamp()
+        if (curTime > passTime) {
+            Thread.sleep(curTime - passTime)
+        }
+    }
+
+    override fun getCurTimeStamp(): Long {
+        return mBufferInfo.presentationTimeUs / 1000
     }
 
     /**

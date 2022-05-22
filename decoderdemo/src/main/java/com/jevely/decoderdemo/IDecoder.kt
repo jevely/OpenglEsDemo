@@ -2,7 +2,7 @@ package com.jevely.decoderdemo
 
 import android.media.MediaFormat
 
-interface IDecoder:Runnable {
+interface IDecoder : Runnable {
 
     /**
      * 暂停解码
@@ -73,5 +73,10 @@ interface IDecoder:Runnable {
      * 获取解码的文件路径
      */
     fun getFilePath(): String
+
+    /**
+     * 获取解码数据的时间
+     */
+    fun getCurTimeStamp(): Long
 
 }
