@@ -228,7 +228,12 @@ class VideoDrawer() : IDrawer {
                 "varying vec2 vCoordinate;" +
                 "uniform samplerExternalOES uTexture;" +
                 "void main() {" +
-                "  gl_FragColor=texture2D(uTexture, vCoordinate);" +
+//                "  gl_FragColor=texture2D(uTexture, vCoordinate);" +
+                    //黑白
+                "  vec4 color = texture2D(uTexture, vCoordinate);" +
+                "  float gray = (color.r + color.g + color.b)/3.0;" +
+                "  gl_FragColor = vec4(gray, gray, gray, 1.0);" +
+
                 "}"
     }
 
