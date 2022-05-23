@@ -1,9 +1,9 @@
 package com.jevely.openglesdemo
 
-import android.opengl.GLSurfaceView
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.Surface
+import androidx.appcompat.app.AppCompatActivity
 import com.jevely.openglesdemo.decoder.AudioDecoder
 import com.jevely.openglesdemo.decoder.VideoDecoder
 import java.util.concurrent.Executors
@@ -36,8 +36,11 @@ class MainActivity3 : AppCompatActivity() {
         drawer.getSurfaceTexture {
             initPlayer(path1, Surface(it), true)
         }
+
         render.addDrawer(drawer)
         gl_surface.addDrawer(drawer)
+
+        Handler().postDelayed(Runnable { drawer.scale(0.5f,0.5f) },1000)
     }
 
     private fun initSecondVideo() {

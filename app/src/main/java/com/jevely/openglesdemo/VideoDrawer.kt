@@ -183,7 +183,7 @@ class VideoDrawer : IDrawer {
 
     // 平移
     fun translate(dx: Float, dy: Float) {
-        Matrix.translateM(mMatrix, 0, dx*mWidthRatio*2, -dy*mHeightRatio*2, 0f)
+        Matrix.translateM(mMatrix, 0, dx * mWidthRatio * 2, -dy * mHeightRatio * 2, 0f)
     }
 
     private fun createGLPrg() {
@@ -325,6 +325,15 @@ class VideoDrawer : IDrawer {
 
     fun getSurfaceTexture(cb: (st: SurfaceTexture) -> Unit) {
         mSftCb = cb
+    }
+
+    /**
+     * 缩放
+     */
+    fun scale(sx: Float, sy: Float) {
+        Matrix.scaleM(mMatrix, 0, sx, sy, 1f)
+        mWidthRatio /= sx
+        mHeightRatio /= sy
     }
 
 }
