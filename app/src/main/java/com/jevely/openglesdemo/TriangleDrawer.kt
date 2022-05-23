@@ -84,6 +84,10 @@ class TriangleDrawer : IDrawer {
         GLES20.glDeleteProgram(mProgram)
     }
 
+    override fun setAlpha(alpha: Float) {
+
+    }
+
     private fun createGLPrg() {
         if (mProgram == -1) {
             val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getVertexShader())

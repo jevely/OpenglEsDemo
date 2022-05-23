@@ -179,4 +179,8 @@ class BitmapDrawer(private val bitmap: Bitmap) : IDrawer {
         GLES20.glDeleteProgram(mProgram)
     }
 
+    override fun setAlpha(alpha: Float) {
+
+    }
+
 }

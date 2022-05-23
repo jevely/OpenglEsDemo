@@ -33,7 +33,9 @@ class MainActivity2 : AppCompatActivity() {
             initPlayer(Surface(it))
         }
         surface?.setEGLContextClientVersion(2)
-        surface?.setRenderer(SimpleRender(drawer!!))
+        val simpleRender = SimpleRender()
+        simpleRender.addDrawer(drawer!!)
+        surface?.setRenderer(simpleRender)
     }
 
     private fun initPlayer(sf: Surface) {

@@ -60,6 +60,11 @@ class VideoDrawer : IDrawer {
     //矩阵变换接收者
     private var mVertexMatrixHandler: Int = -1
 
+    // 半透值接收者
+    private var mAlphaHandler: Int = -1
+
+    private var mAlpha = 1f
+
     private var mSftCb: ((SurfaceTexture) -> Unit)? = null
 
     init {
@@ -193,6 +198,7 @@ class VideoDrawer : IDrawer {
             mTextureHandler = GLES20.glGetUniformLocation(mProgram, "uTexture")
             //【新增2: 获取顶点着色器中的矩阵变量】
             mVertexMatrixHandler = GLES20.glGetUniformLocation(mProgram, "uMatrix")
+            mAlphaHandler = GLES20.glGetAttribLocation(mProgram, "alpha")
         }
         //使用OpenGL程序
         GLES20.glUseProgram(mProgram)
@@ -210,14 +216,18 @@ class VideoDrawer : IDrawer {
 
     private fun getVertexShader(): String {
         return "attribute vec4 aPosition;" +
+                "precision mediump float;" +
                 //【新增4: 矩阵变量】
                 "uniform mat4 uMatrix;" +
                 "attribute vec2 aCoordinate;" +
                 "varying vec2 vCoordinate;" +
+                "attribute float alpha;" +
+                "varying float inAlpha;" +
                 "void main() {" +
                 //【新增5: 坐标变换】
                 "    gl_Position = aPosition*uMatrix;" +
                 "    vCoordinate = aCoordinate;" +
+                "    inAlpha = alpha;" +
                 "}"
     }
 
@@ -226,10 +236,12 @@ class VideoDrawer : IDrawer {
         return "#extension GL_OES_EGL_image_external : require\n" +
                 "precision mediump float;" +
                 "varying vec2 vCoordinate;" +
+                "varying float inAlpha;" +
                 "uniform samplerExternalOES uTexture;" +
                 "void main() {" +
-                "  gl_FragColor=texture2D(uTexture, vCoordinate);" +
-                    //黑白
+                "  vec4 color = texture2D(uTexture, vCoordinate);" +
+                "  gl_FragColor = vec4(color.r, color.g, color.b, inAlpha);" +
+                //黑白
 //                "  vec4 color = texture2D(uTexture, vCoordinate);" +
 //                "  float gray = (color.r + color.g + color.b)/3.0;" +
 //                "  gl_FragColor = vec4(gray, gray, gray, 1.0);" +
@@ -286,6 +298,7 @@ class VideoDrawer : IDrawer {
             0,
             mTextureBuffer
         )
+        GLES20.glVertexAttrib1f(mAlphaHandler, mAlpha)
         //开始绘制
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
     }
@@ -296,6 +309,10 @@ class VideoDrawer : IDrawer {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         GLES20.glDeleteTextures(1, intArrayOf(mTextureId), 0)
         GLES20.glDeleteProgram(mProgram)
+    }
+
+    override fun setAlpha(alpha: Float) {
+        mAlpha = alpha
     }
 
     fun getSurfaceTexture(cb: (st: SurfaceTexture) -> Unit) {

@@ -24,11 +24,17 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.bt).setOnClickListener {
             startActivity(Intent(this@MainActivity, MainActivity2::class.java))
         }
+
+        findViewById<Button>(R.id.bt2).setOnClickListener {
+            startActivity(Intent(this@MainActivity, MainActivity3::class.java))
+        }
     }
 
     private fun initRender(drawer: IDrawer?) {
         surface?.setEGLContextClientVersion(2)
-        surface?.setRenderer(SimpleRender(drawer!!))
+        val simpleRender = SimpleRender()
+        simpleRender.addDrawer(drawer!!)
+        surface?.setRenderer(simpleRender)
     }
 
     override fun onDestroy() {
