@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity3">
 
-    <android.opengl.GLSurfaceView
+    <com.jevely.openglesdemo.DefGLSurfaceVIew
         android:id="@+id/gl_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

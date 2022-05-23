@@ -65,6 +65,9 @@ class VideoDrawer : IDrawer {
 
     private var mAlpha = 1f
 
+    private var mWidthRatio = 1f
+    private var mHeightRatio = 1f
+
     private var mSftCb: ((SurfaceTexture) -> Unit)? = null
 
     init {
@@ -129,37 +132,37 @@ class VideoDrawer : IDrawer {
             val worldRatio = mWorldWidth / mWorldHeight.toFloat()
             if (mWorldWidth > mWorldHeight) {
                 if (originRatio > worldRatio) {
-                    val actualRatio = originRatio / worldRatio
+                    mHeightRatio = originRatio / worldRatio
                     Matrix.orthoM(
                         prjMatrix, 0,
-                        -1f, 1f,
-                        -actualRatio, actualRatio,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
                         -1f, 3f
                     )
                 } else {// 原始比例小于窗口比例，缩放高度度会导致高度超出，因此，高度以窗口为准，缩放宽度
-                    val actualRatio = worldRatio / originRatio
+                    mWidthRatio = worldRatio / originRatio
                     Matrix.orthoM(
                         prjMatrix, 0,
-                        -actualRatio, actualRatio,
-                        -1f, 1f,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
                         -1f, 3f
                     )
                 }
             } else {
                 if (originRatio > worldRatio) {
-                    val actualRatio = originRatio / worldRatio
+                    mHeightRatio = originRatio / worldRatio
                     Matrix.orthoM(
                         prjMatrix, 0,
-                        -1f, 1f,
-                        -actualRatio, actualRatio,
-                        -1f, 3f
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
+                        3f, 5f
                     )
                 } else {// 原始比例小于窗口比例，缩放高度会导致高度超出，因此，高度以窗口为准，缩放宽度
-                    val actualRatio = worldRatio / originRatio
+                    mWidthRatio = worldRatio / originRatio
                     Matrix.orthoM(
                         prjMatrix, 0,
-                        -actualRatio, actualRatio,
-                        -1f, 1f,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
                         -1f, 3f
                     )
                 }
@@ -176,6 +179,11 @@ class VideoDrawer : IDrawer {
             //计算变换矩阵
             Matrix.multiplyMM(mMatrix, 0, prjMatrix, 0, viewMatrix, 0)
         }
+    }
+
+    // 平移
+    fun translate(dx: Float, dy: Float) {
+        Matrix.translateM(mMatrix, 0, dx*mWidthRatio*2, -dy*mHeightRatio*2, 0f)
     }
 
     private fun createGLPrg() {
@@ -225,7 +233,7 @@ class VideoDrawer : IDrawer {
                 "varying float inAlpha;" +
                 "void main() {" +
                 //【新增5: 坐标变换】
-                "    gl_Position = aPosition*uMatrix;" +
+                "    gl_Position = uMatrix*aPosition;" +
                 "    vCoordinate = aCoordinate;" +
                 "    inAlpha = alpha;" +
                 "}"

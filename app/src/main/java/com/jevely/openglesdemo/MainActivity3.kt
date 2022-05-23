@@ -10,7 +10,7 @@ import java.util.concurrent.Executors
 
 class MainActivity3 : AppCompatActivity() {
 
-    private lateinit var gl_surface: GLSurfaceView
+    private lateinit var gl_surface: DefGLSurfaceVIew
     private var path1 = ""
     private var path2 = ""
 
@@ -37,6 +37,7 @@ class MainActivity3 : AppCompatActivity() {
             initPlayer(path1, Surface(it), true)
         }
         render.addDrawer(drawer)
+        gl_surface.addDrawer(drawer)
     }
 
     private fun initSecondVideo() {
