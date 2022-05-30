@@ -1,4 +1,4 @@
-package com.jevely.openglesdemo
+package com.jevely.openglesdemo.render
 
 import android.opengl.GLES20
 import com.jevely.openglesdemo.IDrawer

@@ -10,13 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OpenglEsDemo">
         <activity
-            android:name=".MainActivity3"
+            android:name=".activity.MainActivity4"
             android:exported="false" />
         <activity
-            android:name=".MainActivity2"
+            android:name=".activity.MainActivity3"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity2"
+            android:exported="false" />
+        <activity
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

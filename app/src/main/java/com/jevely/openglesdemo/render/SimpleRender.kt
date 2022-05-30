@@ -1,8 +1,9 @@
-package com.jevely.openglesdemo
+package com.jevely.openglesdemo.render
 
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import com.jevely.openglesdemo.IDrawer
+import com.jevely.openglesdemo.OpenglTool
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

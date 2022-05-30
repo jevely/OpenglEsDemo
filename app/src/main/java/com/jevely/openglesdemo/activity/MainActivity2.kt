@@ -1,12 +1,15 @@
-package com.jevely.openglesdemo
+package com.jevely.openglesdemo.activity
 
 import android.opengl.GLSurfaceView
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.view.Surface
+import com.jevely.openglesdemo.IDrawer
+import com.jevely.openglesdemo.R
 import com.jevely.openglesdemo.decoder.AudioDecoder
 import com.jevely.openglesdemo.decoder.VideoDecoder
+import com.jevely.openglesdemo.render.SimpleRender
+import com.jevely.openglesdemo.render.VideoDrawer
 import java.util.concurrent.Executors
 
 class MainActivity2 : AppCompatActivity() {

@@ -1,8 +1,9 @@
-package com.jevely.openglesdemo
+package com.jevely.openglesdemo.render
 
 import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.opengl.GLUtils
+import com.jevely.openglesdemo.IDrawer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer

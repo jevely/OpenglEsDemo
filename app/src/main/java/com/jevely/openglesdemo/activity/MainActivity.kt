@@ -1,4 +1,4 @@
-package com.jevely.openglesdemo
+package com.jevely.openglesdemo.activity
 
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -6,6 +6,10 @@ import android.opengl.GLSurfaceView
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import com.jevely.openglesdemo.IDrawer
+import com.jevely.openglesdemo.R
+import com.jevely.openglesdemo.render.BitmapDrawer
+import com.jevely.openglesdemo.render.SimpleRender
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +31,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.bt2).setOnClickListener {
             startActivity(Intent(this@MainActivity, MainActivity3::class.java))
+        }
+
+        findViewById<Button>(R.id.bt3).setOnClickListener {
+            startActivity(Intent(this@MainActivity, MainActivity4::class.java))
         }
     }
 

@@ -1,33 +1,37 @@
-package com.jevely.openglesdemo
+package com.jevely.openglesdemo.activity
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.Surface
-import androidx.appcompat.app.AppCompatActivity
+import android.view.SurfaceView
+import com.jevely.openglesdemo.R
 import com.jevely.openglesdemo.decoder.AudioDecoder
 import com.jevely.openglesdemo.decoder.VideoDecoder
+import com.jevely.openglesdemo.render.CustomGLRender
+import com.jevely.openglesdemo.render.VideoDrawer
 import java.util.concurrent.Executors
 
-class MainActivity3 : AppCompatActivity() {
+class MainActivity4 : AppCompatActivity() {
 
-    private lateinit var gl_surface: DefGLSurfaceVIew
     private var path1 = ""
     private var path2 = ""
 
-    private val render = SimpleRender()
-
     private val threadPool = Executors.newFixedThreadPool(10)
+
+    private var mRenderer = CustomGLRender()
+
+    private var sfv: SurfaceView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main3)
-        gl_surface = findViewById(R.id.gl_surface)
+        setContentView(R.layout.activity_main4)
+        sfv = findViewById(R.id.sfv)
         path1 = filesDir.absolutePath + "/小视频.mp4"
         path2 = filesDir.absolutePath + "/dynamic_8.mp4"
-
         initFirstVideo()
         initSecondVideo()
-        initRender()
+        setRenderSurface()
     }
 
     private fun initFirstVideo() {
@@ -36,21 +40,21 @@ class MainActivity3 : AppCompatActivity() {
         drawer.getSurfaceTexture {
             initPlayer(path1, Surface(it), true)
         }
-
-        render.addDrawer(drawer)
-        gl_surface.addDrawer(drawer)
-
-        Handler().postDelayed(Runnable { drawer.scale(0.5f,0.5f) },1000)
+        mRenderer.addDrawer(drawer)
     }
 
     private fun initSecondVideo() {
         val drawer = VideoDrawer()
         drawer.setAlpha(0.5f)
-        drawer.setVideoSize(720, 1280)
+        drawer.setVideoSize(1920, 1080)
         drawer.getSurfaceTexture {
             initPlayer(path2, Surface(it), false)
         }
-        render.addDrawer(drawer)
+        mRenderer.addDrawer(drawer)
+
+        Handler().postDelayed({
+            drawer.scale(0.5f, 0.5f)
+        }, 1000)
     }
 
     private fun initPlayer(path: String, sf: Surface, withSound: Boolean) {
@@ -65,9 +69,8 @@ class MainActivity3 : AppCompatActivity() {
         }
     }
 
-    private fun initRender() {
-        gl_surface.setEGLContextClientVersion(2)
-        gl_surface.setRenderer(render)
+    private fun setRenderSurface() {
+        mRenderer.setSurface(sfv!!)
     }
 
 }

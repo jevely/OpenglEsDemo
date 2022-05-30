@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity3">
+    tools:context=".activity.MainActivity3">
 
     <com.jevely.openglesdemo.DefGLSurfaceVIew
         android:id="@+id/gl_surface"
