@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OpenglEsDemo">
         <activity
+            android:name=".activity.MainActivity5"
+            android:exported="false" />
+        <activity
             android:name=".activity.MainActivity4"
             android:exported="false" />
         <activity

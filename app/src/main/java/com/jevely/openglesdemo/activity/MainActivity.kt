@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.bt3).setOnClickListener {
             startActivity(Intent(this@MainActivity, MainActivity4::class.java))
         }
+
+        findViewById<Button>(R.id.bt4).setOnClickListener {
+            startActivity(Intent(this@MainActivity, MainActivity5::class.java))
+        }
     }
 
     private fun initRender(drawer: IDrawer?) {
